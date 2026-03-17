@@ -1,0 +1,8 @@
+# Python 3.10+ required for agent-framework
+# Install: pip install -r requirements.txt (with microsoft_agent_env activated)
+# For orchestrations: pip install -r requirements.txt --pre
+agent-framework==1.0.0rc2
+agent-framework-orchestrations
+pydantic==2.12.5
+python-dotenv==1.2.1
+streamlit==1.42.0

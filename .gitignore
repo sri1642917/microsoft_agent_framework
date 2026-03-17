@@ -1,0 +1,17 @@
+# Python Cache
+__pycache__/
+*.pyc
+
+# Virtual Environments
+venv/
+env/
+microsoft_agent_env/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+
+# Chatbot Memory
+.neo_session.json
+.eddie_session.json
