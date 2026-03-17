@@ -19,13 +19,13 @@ from main import _is_duplicate_item_error, _clear_session_chat_history
 # Page configuration
 st.set_page_config(
     page_title="Neo Chatbot",
-    page_icon="assets/logo.png",
+    page_icon="assets/neo.png",
     layout="centered",
 )
 
-col1, col2 = st.columns([1, 8])
+col1, col2 = st.columns([1, 8], vertical_alignment="center")
 with col1:
-    st.image("assets/logo.png", width=60)
+    st.image("assets/neo.png", width=60)
 with col2:
     st.title("Neo Chatbot")
     
