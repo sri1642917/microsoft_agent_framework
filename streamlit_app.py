@@ -4,6 +4,8 @@ Streamlit UI for the Neo chatbot.
 
 import asyncio
 import os
+import io
+import contextlib
 import streamlit as st
 from dotenv import load_dotenv
 
@@ -47,7 +49,7 @@ def initialize_session():
         st.session_state.agent_session = st.session_state.agent.create_session()
         
     if "chat_history" not in st.session_state:
-        # Store messages to display in the UI (format: {"role": "user"/"assistant", "content": "text"})
+        # Store messages to display in the UI (format: {"role": "user"/"assistant", "content": "text", "logs": "tool logs"})
         st.session_state.chat_history = []
 
 initialize_session()
@@ -59,6 +61,10 @@ for message in st.session_state.chat_history:
     avatar = "assets/neo.png" if message["role"] == "assistant" else None
     with st.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
+        # Display logs if present
+        if message.get("logs"):
+            with st.expander("🔍 Tool Invocations", expanded=False):
+                st.code(message["logs"], language="text")
 
 # React to user input
 if prompt := st.chat_input("Ask Neo anything..."):
@@ -68,38 +74,48 @@ if prompt := st.chat_input("Ask Neo anything..."):
     st.session_state.chat_history.append({"role": "user", "content": prompt})
 
     # Asynchronous function to run the agent
-    async def run_agent_turn(user_input: str, session: AgentSession) -> str | None:
+    async def run_agent_turn(user_input: str, session: AgentSession) -> tuple[str | None, str]:
         agent = st.session_state.agent
         
         async def _run():
             return await agent.run(user_input, session=session)
 
         response = None
+        logs = ""
+        f = io.StringIO()
         try:
-            response = await _run()
+            with contextlib.redirect_stdout(f):
+                response = await _run()
         except ChatClientException as e:
             if _is_duplicate_item_error(e):
                 _clear_session_chat_history(session)
                 try:
-                    response = await _run()
+                    with contextlib.redirect_stdout(f):
+                        response = await _run()
                 except Exception as retry_ex:
                     st.error(f"Sorry, I hit an error even after retry: {retry_ex}")
             else:
                 st.error(f"Sorry, the service reported an error: {e}")
         except Exception as e:
             st.error(f"Something went wrong: {e}")
+        finally:
+            logs = f.getvalue().strip()
             
-        return response
+        return response, logs
 
     # Display assistant response in chat message container
     with st.chat_message("assistant", avatar="assets/neo.png"):
         with st.spinner("Neo is thinking..."):
-            response = asyncio.run(run_agent_turn(prompt, st.session_state.agent_session))
+            response, logs = asyncio.run(run_agent_turn(prompt, st.session_state.agent_session))
             
             if response is not None:
                 st.markdown(response)
+                # Display tool logs in an expander
+                if logs:
+                    with st.expander("🔍 Tool Invocations", expanded=True):
+                        st.code(logs, language="text")
                 # Add assistant response to UI history
-                st.session_state.chat_history.append({"role": "assistant", "content": response})
+                st.session_state.chat_history.append({"role": "assistant", "content": response, "logs": logs})
 
 # Sidebar controls
 with st.sidebar:
