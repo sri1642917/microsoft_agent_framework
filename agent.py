@@ -1,7 +1,7 @@
 """
-Neo chatbot agent using Microsoft Agent Framework.
+Eddie chatbot agent using Microsoft Agent Framework.
 
-Creates AzureOpenAIResponsesClient and an agent named "neo" that:
+Creates AzureOpenAIResponsesClient and an agent named "eddie" that:
 - Responds conversationally to any general user question
 - Detects arithmetic queries and invokes add, subtract, multiply, or divide via the framework
 - Remembers conversation history and user info via context providers (memory)
@@ -16,14 +16,14 @@ from typing import Sequence
 from agent_framework import InMemoryHistoryProvider
 from agent_framework.azure import AzureOpenAIResponsesClient
 
-from core.memory import UserMemoryProvider
-from core.tools import add, divide, multiply, subtract
+from memory import UserMemoryProvider
+from tools import add, divide, multiply, subtract
 
 
 def _default_context_providers() -> list:
     """
     Task:
-        Return the default list of context providers for Neo (chat history + user memory).
+        Return the default list of context providers for Eddie (chat history + user memory).
 
     Input Parameters:
         None.
@@ -50,7 +50,7 @@ def create_agent(
 ):
     """
     Task:
-        Build the Azure OpenAI client and return the Neo chatbot agent with math tools and memory.
+        Build the Azure OpenAI client and return the Eddie chatbot agent with math tools and memory.
 
     Input Parameters:
         context_providers : Sequence | None, optional
@@ -63,7 +63,7 @@ def create_agent(
 
     Returns:
         Agent
-            Agent instance with name "neo", conversational instructions,
+            Agent instance with name "eddie", conversational instructions,
             tools [add, subtract, multiply, divide], and context_providers (Microsoft Agent Framework).
 
     Raises:
@@ -86,13 +86,17 @@ def create_agent(
     providers = list(context_providers) if context_providers is not None else _default_context_providers()
     # Build agent with tools and context providers (Microsoft Agent Framework as_agent API)
     agent = client.as_agent(
-        name="neo",
+        name="eddie",
         instructions=(
-            "You are Neo, a friendly and helpful chatbot. "
+            "You are Eddie, a friendly and helpful chatbot. "
             "Respond conversationally to any general question the user asks. "
             "When the user asks for arithmetic (add, subtract, multiply, divide, sum, difference, "
-            "product, quotient, or similar), use exactly one of the tools add, subtract, multiply, "
-            "or divide with the numbers they mention, then reply with the result in a natural way. "
+            "product, quotient, or similar), you MUST call the appropriate tool for EVERY "
+            "mathematical operation requested. Do NOT perform any math internally. "
+            "For compound requests (e.g., 'multiply 2 and 3 then divide by 6'), you MUST call "
+            "the tools sequentially or in parallel as needed (e.g., call 'multiply' first, then "
+            "use the result to call 'divide'). All math tools now accept a list of numbers. "
+            "Reply with the final result in a natural way. "
             "For non-arithmetic questions, answer from your knowledge without calling any tool. "
             "Keep responses clear and concise."
         ),

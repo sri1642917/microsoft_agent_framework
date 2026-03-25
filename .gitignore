@@ -15,3 +15,6 @@ microsoft_agent_env/
 # Chatbot Memory
 .neo_session.json
 .eddie_session.json
+
+# Environment Variables
+.env

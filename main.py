@@ -1,5 +1,5 @@
 """
-Neo chatbot — runnable CLI entry point.
+Eddie chatbot — runnable CLI entry point.
 
 Usage:
   python main.py
@@ -16,7 +16,7 @@ Usage:
 Environment:
   Loads .env automatically. Requires AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY,
   DEPLOYMENT_NAME, and optionally OPENAI_API_VERSION (default 2025-03-01-preview).
-  NEO_SESSION_PATH: optional path to session file (default .neo_session.json).
+  EDDIE_SESSION_PATH: optional path to session file (default .eddie_session.json).
     This file is deleted before each run and when the session ends.
 """
 
@@ -32,8 +32,8 @@ load_dotenv()
 from agent_framework import AgentSession
 from agent_framework.exceptions import ChatClientException
 
-from core.agent import create_agent
-from core.memory import FileSessionStorage
+from agent import create_agent
+from memory import FileSessionStorage
 
 
 # Commands that end the chatbot session (case-insensitive)
@@ -98,11 +98,11 @@ def _is_duplicate_item_error(ex: BaseException) -> bool:
 def _clear_session_file() -> None:
     """
     Task:
-        Delete the session file (e.g. .neo_session.json) if it exists so the next run starts fresh.
+        Delete the session file (e.g. .eddie_session.json) if it exists so the next run starts fresh.
 
     Input Parameters:
         None.
-        Uses NEO_SESSION_PATH or default path from _default_session_path().
+        Uses EDDIE_SESSION_PATH or default path from _default_session_path().
 
     Output Parameters:
         None.
@@ -136,12 +136,12 @@ def _default_session_path() -> str:
 
     Returns:
         str
-            Value of NEO_SESSION_PATH if set, otherwise ".neo_session.json".
+            Value of EDDIE_SESSION_PATH if set, otherwise ".eddie_session.json".
 
     Raises:
         None.
     """
-    return os.environ.get("NEO_SESSION_PATH", ".neo_session.json")
+    return os.environ.get("EDDIE_SESSION_PATH", ".eddie_session.json")
 
 
 def _get_storage() -> FileSessionStorage:
@@ -157,7 +157,7 @@ def _get_storage() -> FileSessionStorage:
 
     Returns:
         FileSessionStorage
-            Storage backed by the default or NEO_SESSION_PATH file.
+            Storage backed by the default or EDDIE_SESSION_PATH file.
 
     Raises:
         None.
@@ -172,7 +172,7 @@ def _create_fresh_session(agent) -> AgentSession:
 
     Input Parameters:
         agent : Agent
-            Neo agent instance (from create_agent()).
+            Eddie agent instance (from create_agent()).
 
     Output Parameters:
         None.
@@ -239,13 +239,13 @@ def _is_exit_command(text: str) -> bool:
 async def run_turn(agent, user_input: str, session: AgentSession | None = None) -> None:
     """
     Task:
-        Run one chatbot turn: print user message, call agent.run(), print Neo's reply and tool logs.
+        Run one chatbot turn: print user message, call agent.run(), print Eddie's reply and tool logs.
         Handles duplicate-item API errors by clearing session chat history and retrying once.
         Other errors are caught and reported in a user-friendly way.
 
     Input Parameters:
         agent : Agent
-            Neo agent instance (from create_agent()).
+            Eddie agent instance (from create_agent()).
         user_input : str
             User message string.
         session : AgentSession | None, optional
@@ -279,32 +279,32 @@ async def run_turn(agent, user_input: str, session: AgentSession | None = None) 
             try:
                 response = await _run()
             except Exception as retry_ex:
-                print(f"Neo: Sorry, I hit an error even after retry: {retry_ex}")
+                print(f"Eddie: Sorry, I hit an error even after retry: {retry_ex}")
                 print("-" * 50)
                 return
         else:
-            print(f"Neo: Sorry, the service reported an error: {e}")
+            print(f"Eddie: Sorry, the service reported an error: {e}")
             print("-" * 50)
             return
     except Exception as e:
-        print(f"Neo: Something went wrong: {e}")
+        print(f"Eddie: Something went wrong: {e}")
         print("-" * 50)
         return
 
     if response is not None:
         print("-" * 50)
-        print(f"Neo: {response}\n")
+        print(f"Eddie: {response}\n")
 
 
 async def run_chatbot(agent, session: AgentSession, storage: FileSessionStorage) -> None:
     """
     Task:
-        Run the interactive Neo chatbot loop until the user types quit/exit/q.
+        Run the interactive Eddie chatbot loop until the user types quit/exit/q.
         On exit, save session then clear the session file (fresh session next run).
 
     Input Parameters:
         agent : Agent
-            Neo agent instance.
+            Eddie agent instance.
         session : AgentSession
             Session to use for all turns (conversation history and user memory).
         storage : FileSessionStorage
@@ -320,7 +320,7 @@ async def run_chatbot(agent, session: AgentSession, storage: FileSessionStorage)
         None.
         EOFError from input() is handled (e.g. Ctrl+D). finally: save session, then _clear_session_file().
     """
-    print("\nNeo (chatbot). Say hello or ask anything. For math, try e.g. 'Add 10 and 20'.")
+    print("\nEddie (chatbot). Say hello or ask anything. For math, try e.g. 'Add 10 and 20'.")
     print("I'll remember your name if you tell me (e.g. 'My name is Alice').")
     print("Type 'quit', 'exit', or 'q' to end.\n")
 
@@ -335,7 +335,7 @@ async def run_chatbot(agent, session: AgentSession, storage: FileSessionStorage)
             if not user_input:
                 continue
             if _is_exit_command(user_input):
-                print("Neo: Goodbye!\n")
+                print("Eddie: Goodbye!\n")
                 break
 
             await run_turn(agent, user_input, session=session)

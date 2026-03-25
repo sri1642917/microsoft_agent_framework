@@ -1,5 +1,5 @@
 """
-Memory and persistence for the Neo chatbot (Microsoft Agent Framework).
+Memory and persistence for the Eddie chatbot (Microsoft Agent Framework).
 
 Provides:
 - UserMemoryProvider: context provider that stores user info in session state
@@ -271,4 +271,4 @@ class FileSessionStorage:
         except OSError as e:
             # Graceful: do not fail the process on save errors
             import sys
-            print(f"[Neo] Could not save session: {e}", file=sys.stderr)
+            print(f"[Eddie] Could not save session: {e}", file=sys.stderr)

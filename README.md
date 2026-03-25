@@ -1,96 +1,76 @@
-# Neo Chatbot
+# Eddie Chatbot - Microsoft Agent Framework
 
-This repository contains the **Neo Chatbot** agent built using the [Microsoft Agent Framework]. It supports an interactive CLI mode and a complete, visually appealing **Streamlit User Interface**.
+Eddie is a friendly and helpful conversational agent built using the **Microsoft Agent Framework**. It demonstrates how to integrate Azure OpenAI with custom tools and memory providers to create an interactive AI experience.
 
-Neo can act as a general helpful chatbot, intelligently remembering conversation history and maintaining context. It also has specialized arithmetic tools (addition, subtraction, multiplication, and division) which it correctly identifies and utilizes when given math-related queries.
+## ✨ Key Features
 
-## 🚀 Features
-- **Conversational Memory:** Neo keeps track of context both within the interface using Streamlit session state, and natively via the framework's internal memory provider.
-- **Agentic Tools:** Neo natively executes bound python functions (add, subtract, etc.) when needed to correctly compute responses before replying.
-- **Multi-Agent Orchestration:** Demonstrate concurrent workflow capabilities using `ConcurrentBuilder` to coordinate Researcher, Marketer, and Legal agents on a single business prompt.
-- **Streamlit Web UI:** A beautiful frontend chat interface to talk directly with Neo.
-- **CLI Chatbot:** An interactive command-line interface `main.py` if you prefer working within the terminal.
+- **Conversational Intelligence**: Powered by Azure OpenAI's Responses API for natural and engaging interactions.
+- **Arithmetic Tools**: Eddie can perform mathematical operations using built-in tools for:
+  - Addition (`add`)
+  - Subtraction (`subtract`)
+  - Multiplication (`multiply`)
+  - Division (`divide`)
+- **Contextual Memory**:
+  - **Conversation History**: Eddie remembers the flow of the current conversation.
+  - **User Personalization**: Includes a custom `UserMemoryProvider` that can learn and remember your name (e.g., just say "My name is Alice").
+- **Flexible CLI Interface**:
+  - **Interactive Mode**: A continuous chat loop for ongoing conversations.
+  - **Single Query Mode**: Execute a specific command and exit immediately.
+- **Session Persistence**: Built-in support for saving session state to a local JSON file (`.eddie_session.json`).
 
-## 📁 Repository Structure
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Python 3.10+**
+- An active **Azure OpenAI Service** subscription.
+
+### 1. Setup Environment
+
+Create a `.env` file in the root directory and add your Azure OpenAI configuration:
+
+```env
+AZURE_OPENAI_ENDPOINT=https://your-resource-name.openai.azure.com/
+AZURE_OPENAI_API_KEY=your-api-key
+DEPLOYMENT_NAME=your-deployment-name
+OPENAI_API_VERSION=2025-03-01-preview
 ```
-.
-├── assets/                  # Contains custom images and logos
-│   ├── logo.png             # UI Header Logo 
-│   └── neo.png              # Assistant Chat Avatar
-├── core/                    # Core bot logic and Microsoft Agent Framework configurations
-│   ├── __init__.py
-│   ├── agent.py             # Agent definitions, context providers, and prompt instructions
-│   ├── memory.py            # FileSessionStorage and user-memory state persistence
-│   └── tools.py             # Bound math functions executable by the agent
-├── orchestration_concurrent/# Advanced multi-agent orchestration examples
-│   ├── config.py            # Shared configuration for orchestrations
-│   └── multi_agent.py       # Concurrent workflow execution script
-├── .env.example             # Template for required environment configuration
-├── main.py                  # CLI interactive execution point
-├── requirements.txt         # Project package dependencies
-└── streamlit_app.py         # Streamlit UI execution point
-```
 
-## 🛠️ Setup & Installation
+### 2. Install Dependencies
 
-### 1. Prerequisites
-Ensure you have Python 3.10+ installed.
+Install the required packages using `pip`:
 
-### 2. Install Packages
-It is heavily recommended to use a virtual environment.
 ```bash
-python3 -m venv venv
-source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Environment Configuration
-Copy the `.env.example` file to a new `.env` file and populate it with your specific Azure OpenAI details.
+*Note: For orchestration features, you may need to install with the `--pre` flag as indicated in `requirements.txt`.*
 
-```bash
-cp .env.example .env
-```
+### 3. Run the Chatbot
 
-You will need:
-- `AZURE_OPENAI_ENDPOINT`: Your endpoint URL
-- `AZURE_OPENAI_API_KEY`: Your key
-- `DEPLOYMENT_NAME`: The specific model deployment name 
-- `OPENAI_API_VERSION`: Optional (defaults natively to 2025-03-01-preview)
-
-## 💻 Usage
-
-### Running the Streamlit UI (Recommended)
-You can launch the web interface locally using:
-```bash
-streamlit run streamlit_app.py
-```
-This will open your default web browser to the Chat UI with the custom Neo bot avatar and logo.
-
-### Running the CLI Interactive Mode
-To run the interactive loop directly in your terminal:
+#### Interactive Mode
+Start a continuous conversation with Eddie:
 ```bash
 python main.py
 ```
 
-To run a single prompt query directly from the terminal without entering conversational mode:
+#### Single Query Mode
+Ask a specific question directly from the terminal:
 ```bash
-python main.py "Please add 10 and 42"
+python main.py "What is 125 divided by 5?"
 ```
 
-### Advanced: Multi-Agent Orchestration
-This repository also contains an implementation of **Concurrent Multi-Agent Orchestration** utilizing the framework's `ConcurrentBuilder`.
+## 📂 Project Structure
 
-Located in `orchestration_concurrent/multi_agent.py`, this script spins up three distinct personas simultaneously:
-1. **Researcher**: Provides factual insights and market opportunities.
-2. **Marketer**: Crafts compelling value propositions.
-3. **Legal**: Highlights compliance constraints and disclaimers.
+- `main.py`: The entry point for the CLI application.
+- `agent.py`: Agent definition, instructions, and tool registration using Microsoft Agent Framework.
+- `tools.py`: Implementation of the arithmetic tools with framework-specific logging.
+- `memory.py`: Custom memory providers and session storage logic.
+- `requirements.txt`: Project dependencies and installation notes.
 
-A single user prompt is broadcast to all three agents in parallel. The orchestrator waits for all agents to finish processing, then aggregates their individual expert responses into a single combined output stream.
+## 📝 Commands
 
-To execute the multi-agent concurrency test, run:
-```bash
-python -m orchestration_concurrent.multi_agent
-```
-
-## ⚠️ Notes
-- The chatbot stores its temporary memory to a local json file (`.neo_session.json` by default). The CLI will intentionally clear this out prior to every run to establish a fresh session. The Streamlit UI maintains history per active session inside `st.session_state`.
+In interactive mode, you can use the following commands to exit:
+- `quit`
+- `exit`
+- `q`
